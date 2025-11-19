@@ -9,6 +9,13 @@ export interface Stock {
     trailingPE?: number;
     forwardPE?: number;
     dividendYield?: number;
+    // New advanced metrics
+    pegRatio?: number;
+    priceToBook?: number;
+    beta?: number;
+    fiftyTwoWeekHigh?: number;
+    fiftyTwoWeekLow?: number;
+    volume?: number;
 }
 
 export interface BasketItem {

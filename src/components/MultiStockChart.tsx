@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     LineChart,
     Line,
@@ -9,12 +9,13 @@ import {
     ResponsiveContainer,
     Legend
 } from 'recharts';
-import { Loader2 } from 'lucide-react';
+import { Loader2, DollarSign, Percent } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MultiStockChartProps {
     symbols: string[];
     className?: string;
+    onDataLoaded?: (data: any[]) => void;
 }
 
 const RANGES = [
@@ -37,15 +38,16 @@ const COLORS = [
     '#4f46e5', // Indigo 600
 ];
 
-export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
-    const [data, setData] = useState<any[]>([]);
+export function MultiStockChart({ symbols, className, onDataLoaded }: MultiStockChartProps) {
+    const [rawData, setRawData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [range, setRange] = useState('1mo');
+    const [mode, setMode] = useState<'percent' | 'price'>('percent');
     const [error, setError] = useState('');
 
     useEffect(() => {
         if (symbols.length === 0) {
-            setData([]);
+            setRawData([]);
             setLoading(false);
             return;
         }
@@ -59,40 +61,8 @@ export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
                 const json = await res.json();
                 if (json.error) throw new Error(json.error);
 
-                const rawData = json.data;
-
-                // Normalize to percentage change
-                // Find first valid price for each symbol to use as base
-                const baseValues: Record<string, number> = {};
-
-                // Iterate through data to find first non-null value for each symbol
-                for (const point of rawData) {
-                    for (const sym of symbols) {
-                        if (baseValues[sym] === undefined && point[sym] !== undefined && point[sym] !== null) {
-                            baseValues[sym] = point[sym];
-                        }
-                    }
-                }
-
-                const formattedData = rawData.map((d: any) => {
-                    const point: any = {
-                        dateStr: new Date(d.date).toLocaleDateString(),
-                        original: { ...d } // Keep original values for tooltip if needed
-                    };
-
-                    symbols.forEach(sym => {
-                        if (d[sym] !== undefined && d[sym] !== null && baseValues[sym]) {
-                            // Calculate percentage change: ((current - base) / base) * 100
-                            point[sym] = ((d[sym] - baseValues[sym]) / baseValues[sym]) * 100;
-                        } else {
-                            point[sym] = null;
-                        }
-                    });
-
-                    return point;
-                });
-
-                setData(formattedData);
+                setRawData(json.data);
+                onDataLoaded?.(json.data);
             } catch (err) {
                 console.error(err);
                 setError('Failed to load chart data');
@@ -102,7 +72,43 @@ export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
         };
 
         fetchData();
-    }, [symbols, range]);
+    }, [symbols.join(','), range]);
+
+    const data = useMemo(() => {
+        if (!rawData || rawData.length === 0) return [];
+
+        if (mode === 'price') {
+            return rawData.map((d: any) => ({
+                ...d,
+                dateStr: new Date(d.date).toLocaleDateString(),
+            }));
+        }
+
+        // Percent mode
+        const baseValues: Record<string, number> = {};
+        for (const point of rawData) {
+            for (const sym of symbols) {
+                if (baseValues[sym] === undefined && point[sym] !== undefined && point[sym] !== null) {
+                    baseValues[sym] = point[sym];
+                }
+            }
+        }
+
+        return rawData.map((d: any) => {
+            const point: any = {
+                dateStr: new Date(d.date).toLocaleDateString(),
+                original: { ...d }
+            };
+            symbols.forEach(sym => {
+                if (d[sym] !== undefined && d[sym] !== null && baseValues[sym]) {
+                    point[sym] = ((d[sym] - baseValues[sym]) / baseValues[sym]) * 100;
+                } else {
+                    point[sym] = null;
+                }
+            });
+            return point;
+        });
+    }, [rawData, mode, symbols]);
 
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
@@ -113,7 +119,11 @@ export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
                         <div key={entry.name} className="flex items-center gap-2">
                             <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
                             <span className="font-medium">{entry.name}:</span>
-                            <span>{entry.value?.toFixed(2)}%</span>
+                            <span>
+                                {mode === 'price' ? '$' : ''}
+                                {entry.value?.toFixed(2)}
+                                {mode === 'percent' ? '%' : ''}
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -124,15 +134,42 @@ export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
 
     return (
         <div className={cn("w-full space-y-4", className)}>
-            <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-lg">Performance Comparison (%)</h3>
-                <div className="flex space-x-1 bg-secondary rounded-md p-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg">
+                        {mode === 'percent' ? 'Performance (%)' : 'Share Price ($)'}
+                    </h3>
+                    <div className="flex bg-secondary rounded-md p-0.5">
+                        <button
+                            onClick={() => setMode('percent')}
+                            className={cn(
+                                "p-1.5 rounded-sm transition-all",
+                                mode === 'percent' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            )}
+                            title="Percentage Change"
+                        >
+                            <Percent className="h-4 w-4" />
+                        </button>
+                        <button
+                            onClick={() => setMode('price')}
+                            className={cn(
+                                "p-1.5 rounded-sm transition-all",
+                                mode === 'price' ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+                            )}
+                            title="Share Price"
+                        >
+                            <DollarSign className="h-4 w-4" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex space-x-1 bg-secondary rounded-md p-1 overflow-x-auto">
                     {RANGES.map((r) => (
                         <button
                             key={r.value}
                             onClick={() => setRange(r.value)}
                             className={cn(
-                                "px-2 py-1 text-xs font-medium rounded-sm transition-colors",
+                                "px-2 py-1 text-xs font-medium rounded-sm transition-colors whitespace-nowrap",
                                 range === r.value
                                     ? "bg-background text-foreground shadow-sm"
                                     : "text-muted-foreground hover:text-foreground"
@@ -174,14 +211,19 @@ export function MultiStockChart({ symbols, className }: MultiStockChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${value > 0 ? '+' : ''}${value.toFixed(0)}%`}
+                                tickFormatter={(value) =>
+                                    mode === 'percent'
+                                        ? `${value > 0 ? '+' : ''}${value.toFixed(0)}%`
+                                        : `$${value.toFixed(0)}`
+                                }
+                                domain={['auto', 'auto']}
                             />
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
                             {symbols.map((sym, index) => (
                                 <Line
                                     key={sym}
-                                    type="linear" // Linear interpolation for professional look
+                                    type="linear"
                                     dataKey={sym}
                                     stroke={COLORS[index % COLORS.length]}
                                     strokeWidth={2}

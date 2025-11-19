@@ -15,11 +15,9 @@ export async function GET(request: Request) {
     const symbols = symbolsParam.split(',').map(s => s.trim());
 
     try {
+        // yahooFinance.quote returns a rich object. We just need to map the fields.
         const results = await yahooFinance.quote(symbols) as any;
 
-        // yahooFinance.quote returns a single object if one symbol, or array if multiple
-        // But with 'quote', it usually returns array if we pass array.
-        // Let's handle both cases just to be safe, although the library typing says array for array input.
         const quotes = Array.isArray(results) ? results : [results];
 
         const stocks: Stock[] = quotes.map((q: any) => ({
@@ -33,6 +31,13 @@ export async function GET(request: Request) {
             trailingPE: q.trailingPE,
             forwardPE: q.forwardPE,
             dividendYield: q.dividendYield,
+            // New mappings
+            pegRatio: q.pegRatio, // Price/Earnings-to-Growth
+            priceToBook: q.priceToBook,
+            beta: q.beta, // Volatility relative to market
+            fiftyTwoWeekHigh: q.fiftyTwoWeekHigh,
+            fiftyTwoWeekLow: q.fiftyTwoWeekLow,
+            volume: q.regularMarketVolume,
         }));
 
         return NextResponse.json({ stocks });

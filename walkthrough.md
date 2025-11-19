@@ -14,11 +14,12 @@ This application allows you to track baskets of stocks and visualize their perfo
 - **Search Stocks**: Use the search bar to find stocks by symbol or name (e.g., "AAPL", "Tesla").
 - **Add/Remove**: Add stocks to your basket or remove them with a click.
 
-### 3. Visualization & Metrics
+### 3. Visualization & Analytics
 - **Multi-Stock Comparison**: View all stocks in the basket on a single chart.
-  - **Percentage Change**: Normalized performance (0% baseline) to compare stocks of different prices.
-  - **Linear Interpolation**: Professional financial chart style.
-  - **Interactive Tooltip**: Hover to see values for all stocks at any date.
+- **Fundamentals Dashboard**: Compare key metrics like P/E, PEG, and Dividend Yield using interactive bar charts.
+- **Risk Analysis**:
+  - **Correlation Matrix**: Heatmap showing how stocks move together.
+  - **Diversification Insights**: Identify highly correlated assets.
 - **Metrics Table**: Compare key metrics:
   - **Price**: Current market price.
   - **Change**: Daily price change (Green/Red).
