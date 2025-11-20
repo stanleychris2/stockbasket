@@ -7,7 +7,8 @@ import { MultiStockChart } from '@/components/MultiStockChart';
 import { MetricsTable } from '@/components/MetricsTable';
 import { FundamentalsChart } from '@/components/FundamentalsChart';
 import { CorrelationMatrix } from '@/components/CorrelationMatrix';
-import { ArrowLeft, Loader2, Activity, BarChart3, LineChart } from 'lucide-react';
+import { ReturnsHeatmapTable } from '@/components/ReturnsHeatmapTable';
+import { ArrowLeft, Loader2, Activity, BarChart3, LineChart, Table2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -20,7 +21,7 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
     const [loadingStocks, setLoadingStocks] = useState(false);
     const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
     const [chartData, setChartData] = useState<any[]>([]);
-    const [activeTab, setActiveTab] = useState<'overview' | 'fundamentals' | 'risk'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'fundamentals' | 'risk' | 'returns'>('overview');
 
     const basket = baskets.find((b) => b.id === id);
 
@@ -120,6 +121,16 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
                                 <Activity className="h-4 w-4" />
                                 Risk & Correlation
                             </button>
+                            <button
+                                onClick={() => setActiveTab('returns')}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                                    activeTab === 'returns' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <Table2 className="h-4 w-4" />
+                                Returns
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -170,16 +181,17 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
                                 </div>
                             </div>
                             <div className="space-y-6">
-                                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                                    <h3 className="font-semibold mb-4">Basket Summary</h3>
-                                    <div className="space-y-4 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Total Items</span>
-                                            <span className="font-medium">{basket.items.length}</span>
+                                {/* Basket Summary - Compact */}
+                                <div className="border rounded-lg bg-card p-6">
+                                    <h3 className="font-semibold text-lg mb-4">Basket Summary</h3>
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <div className="text-muted-foreground">Total Items</div>
+                                            <div className="font-semibold text-xl">{basket.items.length}</div>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Created</span>
-                                            <span className="font-medium">{new Date(basket.createdAt).toLocaleDateString()}</span>
+                                        <div>
+                                            <div className="text-muted-foreground">Created</div>
+                                            <div className="font-semibold text-xl">{new Date(basket.createdAt).toLocaleDateString()}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -236,6 +248,12 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
                                         </ul>
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'returns' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <ReturnsHeatmapTable symbols={symbols} />
                             </div>
                         )}
                     </div>

@@ -1,5 +1,6 @@
 import { Basket } from '@/types';
-import { Trash2, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
+import { Trash2, TrendingUp, TrendingDown, X } from 'lucide-react';
 import { StockSearch } from './StockSearch';
 
 interface BasketCardProps {
@@ -39,7 +40,9 @@ export function BasketCard({ basket, onDelete, onAddStock, onRemoveStock, onView
                                     key={item.symbol}
                                     className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80"
                                 >
-                                    {item.symbol}
+                                    <Link href={`/stock/${item.symbol}`} className="hover:underline">
+                                        {item.symbol}
+                                    </Link>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -47,8 +50,8 @@ export function BasketCard({ basket, onDelete, onAddStock, onRemoveStock, onView
                                         }}
                                         className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                     >
+                                        <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
                                         <span className="sr-only">Remove</span>
-                                        ×
                                     </button>
                                 </div>
                             ))

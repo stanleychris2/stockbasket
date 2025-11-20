@@ -1,5 +1,6 @@
 import { Stock } from '@/types';
-import { ArrowUp, ArrowDown } from 'lucide-react';
+import Link from 'next/link';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MetricsTableProps {
@@ -44,16 +45,18 @@ export function MetricsTable({ stocks, onSelectStock, selectedSymbol }: MetricsT
                                         isSelected && "bg-muted"
                                     )}
                                 >
-                                    <td className="px-4 py-3 font-medium">
-                                        <div>{stock.symbol}</div>
-                                        <div className="text-xs text-muted-foreground">{stock.shortName}</div>
+                                    <td className="py-4">
+                                        <Link href={`/stock/${stock.symbol}`} className="group">
+                                            <div className="font-semibold text-foreground group-hover:text-primary transition-colors">{stock.symbol}</div>
+                                            <div className="text-sm text-muted-foreground">{stock.longName || stock.shortName}</div>
+                                        </Link>
                                     </td>
                                     <td className="px-4 py-3 text-right font-mono">
                                         ${stock.regularMarketPrice.toFixed(2)}
                                     </td>
                                     <td className={cn("px-4 py-3 text-right font-mono", isUp ? "text-stock-up" : "text-stock-down")}>
                                         <div className="flex items-center justify-end gap-1">
-                                            {isUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                                            {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                             {Math.abs(stock.regularMarketChange).toFixed(2)}
                                         </div>
                                     </td>

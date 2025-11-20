@@ -9,6 +9,8 @@ export async function GET(request: Request) {
     const symbolParam = searchParams.get('symbol');
     const range = searchParams.get('range') || '1mo';
     const interval = searchParams.get('interval') || '1d';
+    const fromParam = searchParams.get('from');
+    const toParam = searchParams.get('to');
 
     // Support both 'symbol' (legacy/single) and 'symbols' (multiple)
     const symbols = symbolsParam
@@ -22,17 +24,23 @@ export async function GET(request: Request) {
     }
 
     try {
-        const endDate = new Date();
         let startDate = new Date();
+        let endDate = new Date();
 
-        switch (range) {
-            case '1w': startDate.setDate(endDate.getDate() - 7); break;
-            case '1mo': startDate.setMonth(endDate.getMonth() - 1); break;
-            case '3mo': startDate.setMonth(endDate.getMonth() - 3); break;
-            case '6mo': startDate.setMonth(endDate.getMonth() - 6); break;
-            case '1y': startDate.setFullYear(endDate.getFullYear() - 1); break;
-            case '5y': startDate.setFullYear(endDate.getFullYear() - 5); break;
-            default: startDate.setMonth(endDate.getMonth() - 1);
+        if (fromParam && toParam) {
+            startDate = new Date(fromParam);
+            endDate = new Date(toParam);
+        } else {
+            // Default range logic
+            switch (range) {
+                case '1w': startDate.setDate(endDate.getDate() - 7); break;
+                case '1mo': startDate.setMonth(endDate.getMonth() - 1); break;
+                case '3mo': startDate.setMonth(endDate.getMonth() - 3); break;
+                case '6mo': startDate.setMonth(endDate.getMonth() - 6); break;
+                case '1y': startDate.setFullYear(endDate.getFullYear() - 1); break;
+                case '5y': startDate.setFullYear(endDate.getFullYear() - 5); break;
+                default: startDate.setMonth(endDate.getMonth() - 1);
+            }
         }
 
         // Fetch data for all symbols in parallel
