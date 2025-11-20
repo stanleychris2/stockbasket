@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils';
 interface StockSearchProps {
     onSelect: (symbol: string) => void;
     className?: string;
+    placeholder?: string;
 }
 
-export function StockSearch({ onSelect, className }: StockSearchProps) {
+export function StockSearch({ onSelect, className, placeholder = "Search stocks (e.g. AAPL, TSLA)..." }: StockSearchProps) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ export function StockSearch({ onSelect, className }: StockSearchProps) {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search stocks (e.g. AAPL, TSLA)..."
+                    placeholder={placeholder}
                     className="w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
                 {loading && (

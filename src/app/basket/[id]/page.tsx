@@ -159,8 +159,8 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
                  Let's keep it mounted and use `display: none` if not active tab to preserve state/data.
              */}
 
-                        <div className={cn("grid gap-8 lg:grid-cols-3", activeTab !== 'overview' && "hidden")}>
-                            <div className="lg:col-span-2 space-y-6">
+                        {activeTab === 'overview' && (
+                            <div className="space-y-6">
                                 <MultiStockChart
                                     symbols={symbols}
                                     onDataLoaded={setChartData}
@@ -180,23 +180,7 @@ export default function BasketPage({ params }: { params: Promise<{ id: string }>
                                     )}
                                 </div>
                             </div>
-                            <div className="space-y-6">
-                                {/* Basket Summary - Compact */}
-                                <div className="border rounded-lg bg-card p-6">
-                                    <h3 className="font-semibold text-lg mb-4">Basket Summary</h3>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <div className="text-muted-foreground">Total Items</div>
-                                            <div className="font-semibold text-xl">{basket.items.length}</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-muted-foreground">Created</div>
-                                            <div className="font-semibold text-xl">{new Date(basket.createdAt).toLocaleDateString()}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        )}
 
                         {activeTab === 'fundamentals' && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

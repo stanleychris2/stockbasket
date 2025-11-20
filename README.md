@@ -1,60 +1,106 @@
-# Stock Basket App 📈
+# Folio
 
-A modern web application to track, manage, and visualize custom baskets of stocks. Built with Next.js 15 and Tailwind CSS.
-
-![Stock Basket Dashboard](public/screenshots/dashboard.png)
-
-## Overview
-
-Stock Basket App allows investors to group stocks into "baskets" (e.g., "Tech Giants", "Green Energy") and visualize their collective performance. It normalizes stock data to show percentage changes, enabling easy comparison between stocks of vastly different prices.
+A modern, intuitive stock portfolio tracker built with Next.js 16.
 
 ## Features
 
-- **🧺 Basket Management**: Create custom groups of stocks with names and descriptions.
-- **🔍 Smart Search**: Instantly search and add stocks using the Yahoo Finance API.
-- **📊 Multi-Stock Visualization**: Compare performance of all stocks in a basket on a single, interactive chart.
-  - **Percentage Change**: Normalized data (0% baseline) for fair comparison.
-  - **Linear Interpolation**: Professional financial charting style.
-- **📈 Key Metrics**: View real-time price, P/E ratios, market cap, and daily changes.
-- **🌓 Premium Design**: Sleek UI with a dark-mode-first aesthetic using Tailwind CSS v4.
-
-![Basket Detail View](public/screenshots/basket-detail.png)
+- **Custom Stock Baskets**: Organize stocks into themed collections
+- **Real-time Data**: Live quotes powered by Yahoo Finance
+- **Performance Analytics**: Track 1D, 5D returns and historical performance
+- **Interactive Charts**: Multi-stock comparison with zoom and custom ranges
+- **Returns Heatmap**: Sortable performance matrix across time periods
+- **Correlation Analysis**: Measure portfolio diversification
+- **Single Stock Views**: Detailed company info, news, and financials
 
 ## Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-- **Charts**: [Recharts](https://recharts.org/)
-- **Data**: [Yahoo Finance 2](https://github.com/gadicc/node-yahoo-finance2)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS v4
+- **Charts**: Recharts
+- **Data**: Yahoo Finance 2
+- **Storage**: Browser localStorage
+- **Icons**: Lucide React
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - npm or yarn
 
 ### Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/stanleychris2/stockbasket.git
-   cd stockbasket
-   ```
+```bash
+# Install dependencies
+npm install
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# Run development server
+npm run dev
 
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+# Build for production
+npm run build
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+# Start production server
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## Deployment
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/stanleychris2/stockbasket)
+
+Or manually:
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+### Environment Variables
+
+No environment variables required! The app uses browser localStorage and Yahoo Finance's public API.
+
+## Data Storage
+
+Folio uses **localStorage** for personal use. Your baskets are stored locally in your browser:
+- ✅ Privacy-first (data never leaves your device)
+- ✅ Instant access
+- ⚠️ Not synced across devices
+- ⚠️ Cleared if you clear browser data
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/           # API routes (quote, search, chart, stock-details)
+│   ├── basket/[id]/   # Basket detail page
+│   ├── stock/[symbol] # Single stock view
+│   ├── about/         # About page
+│   └── page.tsx       # Dashboard (home)
+├── components/        # React components
+├── hooks/             # Custom hooks (useBaskets)
+├── types/             # TypeScript types
+└── lib/               # Utilities
+```
 
 ## License
 
 MIT
+
+## Developer
+
+Built by [Chris Tanley](https://christanley.xyz)
+
+## Disclaimer
+
+Folio is for informational purposes only. Stock data provided by Yahoo Finance. Not financial advice. Always do your own research before making investment decisions.

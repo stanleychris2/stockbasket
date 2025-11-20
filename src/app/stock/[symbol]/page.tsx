@@ -84,6 +84,14 @@ export default function StockPage({ params }: { params: Promise<{ symbol: string
                                 <span>•</span>
                                 <span>{summaryProfile?.country}</span>
                             </div>
+                            <div className="mt-3">
+                                <Link
+                                    href={`/options/${decodedSymbol}`}
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                                >
+                                    View Options
+                                </Link>
+                            </div>
                         </div>
 
                         <div className="flex flex-col items-end">

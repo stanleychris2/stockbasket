@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import posthog from 'posthog-js';
 import { Basket, BasketItem } from '@/types';
 
 const STORAGE_KEY = 'stockbasket_baskets';
@@ -34,6 +35,14 @@ export function useBaskets() {
             createdAt: new Date().toISOString(),
         };
         setBaskets((prev) => [...prev, newBasket]);
+
+        // Track basket creation event
+        posthog.capture('basket_created', {
+            basket_id: newBasket.id,
+            basket_name: name,
+            has_description: !!description,
+        });
+
         return newBasket;
     };
 
@@ -50,6 +59,15 @@ export function useBaskets() {
                         symbol,
                         addedAt: new Date().toISOString(),
                     };
+
+                    // Track stock added event
+                    posthog.capture('stock_added', {
+                        basket_id: basketId,
+                        basket_name: b.name,
+                        stock_symbol: symbol,
+                        basket_stock_count: b.items.length + 1,
+                    });
+
                     return { ...b, items: [...b.items, newItem] };
                 }
                 return b;
